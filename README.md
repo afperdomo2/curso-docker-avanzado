@@ -54,3 +54,25 @@ docker run distroless
 ```bash
 docker run --entrypoint=sh -ti distroless
 ```
+
+### 3. 🔍 DockerScan
+
+**📝 Descripción**: Este proyecto demuestra técnicas de escaneo de vulnerabilidades en imágenes Docker, utilizando una aplicación web ASP.NET Core construida con un build multistage. Incluye ejemplos de cómo integrar herramientas de escaneo para identificar CVEs y mejorar la seguridad de los contenedores.
+
+**▶️ Comandos para ejecutar**:
+
+```bash
+cd DockerScan
+docker build -t dockerscan .
+docker run -p 8081:80 dockerscan
+```
+
+🌐 Accede a la aplicación en `http://localhost:8081/swagger` para ver la documentación interactiva de la API.
+
+**🔎 Escaneo de vulnerabilidades**: Después de construir la imagen, puedes escanearla con herramientas como Trivy o Docker Scan:
+
+```bash
+docker scan dockerscan
+# O con Trivy
+trivy image dockerscan
+```
