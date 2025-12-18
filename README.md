@@ -59,11 +59,21 @@ docker run --entrypoint=sh -ti distroless
 
 **📝 Descripción**: Este proyecto demuestra técnicas de escaneo de vulnerabilidades en imágenes Docker, utilizando una aplicación web ASP.NET Core construida con un build multistage. Incluye ejemplos de cómo integrar herramientas de escaneo para identificar CVEs y mejorar la seguridad de los contenedores.
 
+**🌍 Imágenes Multiplataforma**: Este proyecto también ilustra el concepto de imágenes Docker multiplataforma, que permiten ejecutar el contenedor en diferentes arquitecturas de hardware (como AMD64 y ARM64), facilitando despliegues en entornos heterogéneos sin reconstruir manualmente. 🏷️ Para esto se debe activar `Use containerd for pulling and storing images` en las configuraciones de **Docker Desktop**.
+
 **▶️ Comandos para ejecutar**:
 
 ```bash
 cd DockerScan
+
+# Contruir la imagen
+
+# Opción 1: Construir imagen normal
 docker build -t dockerscan .
+
+# Opción 2: Construir imagen multiplataforma
+docker build --platform linux/amd64,linux/arm64 -t dockerscan:multi .
+
 docker run -p 8081:80 dockerscan
 ```
 
