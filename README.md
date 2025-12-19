@@ -160,7 +160,9 @@ CMD ["echo", "Hello, World!"]
 
 &nbsp;
 
-## 🔍 Build Context
+## 🔧 Conceptos Avanzados
+
+### 🔍 1. Build Context
 
 **📝 ¿Qué es el Build Context?**
 
@@ -187,3 +189,43 @@ docker build -t mi-imagen ./mi-app
 - Mantén el context pequeño y relevante.
 - Revisa el `.dockerignore` para excluir logs, node_modules, etc.
 - Si el context es grande, considera usar multi-stage builds o volúmenes para optimizar.
+
+---
+
+### 🚫 2. dockerignore
+
+**📝 ¿Qué es .dockerignore?**
+
+El archivo `.dockerignore` funciona como un `.gitignore` para Docker: excluye archivos y directorios del build context, evitando que se envíen al daemon durante `docker build`. Esto acelera builds, reduce el tamaño del context y mejora la seguridad al excluir archivos sensibles.
+
+**🔧 Por qué usarlo**:
+
+- **Eficiencia**: Excluye archivos innecesarios (ej. logs, cachés) para builds más rápidos.
+- **Seguridad**: Evita copiar accidentalmente claves, contraseñas o datos sensibles.
+- **Optimización**: Reduce el tráfico de red y el uso de disco en el daemon.
+
+**📋 Ejemplos por proyecto**:
+
+A continuación, ejemplos de `.dockerignore` para cada proyecto, basados en sus tecnologías:
+
+**1. 🏗️ MultiStage (.NET)**:
+
+```dockerignore
+# .NET specific ignores
+bin/
+obj/
+.vs/
+*.user
+*.tmp
+*.log
+logs/
+node_modules/
+.DS_Store
+Thumbs.db
+```
+
+**💡 Consejos**:
+
+- Personaliza según tu proyecto; incluye patrones como `*.log`, `node_modules/`, etc.
+- Verifica con `docker build --no-cache` para asegurar que no falten archivos necesarios.
+- Usa wildcards (*) para patrones amplios.

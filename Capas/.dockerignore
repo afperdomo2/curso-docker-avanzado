@@ -1,0 +1,9 @@
+# General ignores
+*.log
+*.tmp
+.DS_Store
+Thumbs.db
+.cache/
+temp/
+build/
+dist/

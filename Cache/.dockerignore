@@ -1,0 +1,8 @@
+# Nginx and general ignores
+*.log
+*.tmp
+.DS_Store
+Thumbs.db
+nginx.conf.bak
+access.log
+error.log

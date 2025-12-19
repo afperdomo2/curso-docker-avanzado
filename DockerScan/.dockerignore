@@ -1,0 +1,11 @@
+# .NET specific ignores
+bin/
+obj/
+.vs/
+*.user
+*.tmp
+*.log
+logs/
+appsettings.Development.json
+.DS_Store
+Thumbs.db
