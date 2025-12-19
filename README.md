@@ -10,6 +10,8 @@ El objetivo de este curso es enseñar conceptos avanzados de Docker, incluyendo:
 - 🔒 Uso de imágenes distroless para minimizar la superficie de ataque y el tamaño de los contenedores.
 - 📋 Mejores prácticas para el desarrollo y despliegue de aplicaciones en contenedores.
 
+&nbsp;
+
 ## 1. 🏗️ MultiStage
 
 **📝 Descripción**: Este proyecto demuestra el uso de builds multistage en Docker para una aplicación web ASP.NET Core. En un build multistage, se utiliza una imagen base para compilar y preparar la aplicación, y luego se copia el resultado a una imagen más ligera para el runtime, reduciendo el tamaño final de la imagen.
@@ -22,6 +24,10 @@ El objetivo de este curso es enseñar conceptos avanzados de Docker, incluyendo:
 cd MultiStage
 docker build -t multistage .
 ```
+
+---
+
+&nbsp;
 
 ## 2. 🔒 Distroless
 
@@ -52,6 +58,10 @@ docker run distroless
 docker run --entrypoint=sh -ti distroless
 ```
 
+---
+
+&nbsp;
+
 ## 3. 🔍 DockerScan
 
 **📝 Descripción**: Este proyecto demuestra técnicas de escaneo de vulnerabilidades en imágenes Docker, utilizando una aplicación web ASP.NET Core construida con un build multistage. Incluye ejemplos de cómo integrar herramientas de escaneo para identificar CVEs y mejorar la seguridad de los contenedores.
@@ -72,7 +82,9 @@ docker build -t dockerscan .
 docker build --platform linux/amd64,linux/arm64 -t dockerscan:multi .
 ```
 
-🌐 Accede a la aplicación en `http://localhost:8081/swagger` para ver la documentación interactiva de la API.
+---
+
+&nbsp;
 
 ## 4. 🗂️ Cache
 
@@ -102,6 +114,36 @@ FROM nginx:1.21.6
 ARG CACHEBUST=1
 
 RUN apt-get update && apt-get -y upgrade && echo $CACHEBUST > /dev/null
-
-RUN echo '<html><body><h1>Hola, Mundo desde NGINX en Docker!</h1></body></html>' > /usr/share/nginx/html/index.html
 ```
+
+---
+
+&nbsp;
+
+## 🔍 Build Context
+
+**📝 ¿Qué es el Build Context?**
+
+El build context es el conjunto de archivos y directorios que Docker envía al daemon de Docker durante el proceso de construcción de una imagen. Por defecto, es el directorio actual (.) donde ejecutas `docker build`, pero puedes especificarlo explícitamente.
+
+**🔧 Por qué importa**:
+
+- **Eficiencia**: Solo los archivos en el context se envían al daemon, evitando transferencias innecesarias de archivos grandes o irrelevantes.
+- **Seguridad**: No incluyas archivos sensibles (como .env o claves) en el context, ya que podrían copiarse accidentalmente.
+- **Optimización**: Usa `.dockerignore` para excluir archivos no necesarios, reduciendo el tamaño del context y acelerando builds.
+
+**📋 Ejemplo**:
+
+```bash
+# Construir desde el directorio actual
+docker build -t mi-imagen .
+
+# Construir desde un subdirectorio
+docker build -t mi-imagen ./mi-app
+```
+
+**💡 Consejos**:
+
+- Mantén el context pequeño y relevante.
+- Revisa el `.dockerignore` para excluir logs, node_modules, etc.
+- Si el context es grande, considera usar multi-stage builds o volúmenes para optimizar.
