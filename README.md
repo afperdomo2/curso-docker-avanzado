@@ -120,6 +120,46 @@ RUN apt-get update && apt-get -y upgrade && echo $CACHEBUST > /dev/null
 
 &nbsp;
 
+## 5. 🧱 Capas
+
+**📝 Descripción**: Este proyecto demuestra el concepto de capas en Docker, donde cada instrucción en el Dockerfile crea una capa nueva. Incluye un contenedor Ubuntu simple que instala dependencias, copia archivos y ejecuta un comando, ilustrando cómo optimizar capas para reducir el tamaño de la imagen y mejorar la eficiencia.
+
+**🔧 Importancia de las Capas**:
+
+- Cada `RUN`, `COPY`, `ADD`, etc., crea una capa que se cachea.
+- **Optimización**: Combina comandos en una sola `RUN` y limpia cachés (ej. `rm -rf /var/lib/apt/lists/*`) para evitar capas innecesarias.
+- **Beneficios**: Acelera builds reutilizando capas cacheadas, pero capas grandes aumentan el tamaño de la imagen.
+
+**▶️ Comandos para ejecutar**:
+
+```bash
+cd Capas
+docker build -t capas .
+docker run capas
+```
+
+**📜 Script del Dockerfile**:
+
+```dockerfile
+# Capa 1: Imagen base
+FROM ubuntu:latest
+
+# Capa 2: Instalar dependencias necesarias y limpiar caché
+RUN apt-get update && apt-get install -y \
+    curl && \
+    rm -rf /var/lib/apt/lists/*
+
+# Capa 3: Copiar archivos de la aplicación
+COPY . /app
+
+# Capa 4: Establecer el directorio de trabajo
+CMD ["echo", "Hello, World!"]
+```
+
+---
+
+&nbsp;
+
 ## 🔍 Build Context
 
 **📝 ¿Qué es el Build Context?**
