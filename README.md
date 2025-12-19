@@ -14,14 +14,14 @@ El objetivo de este curso es enseñar conceptos avanzados de Docker, incluyendo:
 
 **📝 Descripción**: Este proyecto demuestra el uso de builds multistage en Docker para una aplicación web ASP.NET Core. En un build multistage, se utiliza una imagen base para compilar y preparar la aplicación, y luego se copia el resultado a una imagen más ligera para el runtime, reduciendo el tamaño final de la imagen.
 
+**📏 Optimización de Tamaño**: Usando imágenes Alpine (basadas en Alpine Linux), el tamaño de la imagen se reduce drásticamente. Por ejemplo, cambiando de `dotnet/sdk:8.0` a `dotnet/sdk:8.0-alpine` y `dotnet/runtime:8.0-alpine`, el tamaño pasa de ~857 MB a ~91 MB, destacando la importancia de elegir imágenes base eficientes para optimizar recursos y tiempos de despliegue.
+
 **▶️ Comandos para ejecutar**:
 
 ```bash
 cd MultiStage
 docker build -t multistage .
 ```
-
-🌐 Accede a la aplicación en `http://localhost:8080/swagger` para ver la documentación interactiva de la API.
 
 ## 2. 🔒 Distroless
 
