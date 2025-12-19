@@ -160,6 +160,47 @@ CMD ["echo", "Hello, World!"]
 
 &nbsp;
 
+## 6. 👤 Usuarios
+
+**📝 Descripción**: Este proyecto demuestra el uso de usuarios no root en contenedores Docker para mejorar la seguridad. Se crea un grupo y un usuario específico, se cambian los permisos necesarios, y se ejecuta el contenedor con el usuario no privilegiado, evitando riesgos asociados al uso de root.
+
+**🔒 Seguridad**: Ejecutar procesos como root en contenedores puede aumentar la superficie de ataque. Usar un usuario dedicado limita los permisos y mejora la seguridad.
+
+**▶️ Comandos para ejecutar**:
+
+```bash
+cd Usuarios
+docker build -t usuarios .
+docker run usuarios
+```
+
+**📜 Script del Dockerfile**:
+
+```dockerfile
+# Utilizar nginx versión 1.29 como imagen base
+FROM nginx:1.29
+
+# Actualizar y mejorar los paquetes del sistema
+RUN apt-get update && apt-get -y upgrade
+
+# Crear un nuevo grupo y usuario para ejecutar el contenedor
+RUN groupadd -r user_group && useradd -r -g user_group felipe_user
+# Cambiar la propiedad de /usr/share al nuevo usuario
+RUN chown -R felipe_user:user_group /usr/share
+# Cambiar al usuario no root
+USER felipe_user
+
+# ❌ No se puede ejecutar este comando porque requiere permisos de superusuario
+# RUN apt-get update && apt-get -y upgrade
+
+# Comando a ejecutar cuando el contenedor inicie
+CMD ["bash", "-c", "echo 'Hola, soy Felipe'"]
+```
+
+---
+
+&nbsp;
+
 ## 🔧 Conceptos Avanzados
 
 ### 🔍 1. Build Context
