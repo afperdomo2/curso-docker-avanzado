@@ -201,6 +201,136 @@ CMD ["bash", "-c", "echo 'Hola, soy Felipe'"]
 
 &nbsp;
 
+## 7. ⚖️ BalanceadorCarga
+
+**📝 Descripción**: Este proyecto demuestra el uso de Docker Compose para orquestar múltiples contenedores y configurar un balanceador de carga con Nginx. Incluye un proxy inverso que distribuye las solicitudes entre tres servidores backend, ilustrando cómo crear una arquitectura escalable y resiliente usando Docker Compose y redes personalizadas.
+
+**🌐 Arquitectura**:
+
+La arquitectura consta de cuatro componentes principales:
+
+- **Proxy (Nginx)**: Actúa como balanceador de carga, distribuyendo las solicitudes entre los tres servidores backend usando la técnica de "round-robin" (distribución equitativa).
+- **Backend 1, 2 y 3**: Tres servidores Nginx independientes que sirven contenido distintivo, permitiendo verificar que las solicitudes se distribuyen entre ellos.
+- **Red personalizada (app-network)**: Todos los servicios se conectan a una red bridge personalizada que permite la comunicación interna entre contenedores usando los nombres de los servicios como hostnames.
+
+**🔧 Conceptos clave**:
+
+1. **Docker Compose**: Herramienta para orquestar múltiples contenedores como un servicio único.
+2. **Redes personalizadas**: Facilitan la comunicación entre contenedores sin exponer puertos al host.
+3. **Proxy inverso**: Nginx recibe las solicitudes y las reenvía a los servidores backend.
+4. **Upstream**: Grupo de servidores backend definidos en Nginx que actúan como destinos para el balanceo de carga.
+5. **Encabezados HTTP**: Headers como `X-Real-IP`, `X-Upstream-Server` y `Host` se reenvían para mantener información útil entre el cliente y los servidores.
+
+**📋 Estructura del proyecto**:
+
+```
+BalanceadorCarga/
+├── docker-compose.yaml       # Orquestación de servicios
+├── proxy/
+│   ├── Dockerfile            # Imagen del proxy (Nginx)
+│   └── nginx.conf            # Configuración del balanceador de carga
+├── sitio1/
+│   └── Dockerfile            # Primer servidor backend
+├── sitio2/
+│   └── Dockerfile            # Segundo servidor backend
+└── sitio3/
+    └── Dockerfile            # Tercer servidor backend
+```
+
+**🔍 Configuración destacada**:
+
+**docker-compose.yaml**:
+
+```yaml
+services:
+  proxy:
+    build: ./proxy
+    ports:
+      - "8081:80"              # Expone el proxy en puerto 8081 del host
+    depends_on:
+      - backend1
+      - backend2
+      - backend3
+    networks:
+      - app-network
+
+  backend1:
+    build: ./sitio1
+    networks:
+      - app-network
+
+  backend2:
+    build: ./sitio2
+    networks:
+      - app-network
+
+  backend3:
+    build: ./sitio3
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge             # Red personalizada para comunicación interna
+```
+
+**nginx.conf**:
+
+El archivo de configuración define:
+
+- **Upstream backend_servers**: Grupo de tres servidores (backend1, backend2, backend3) para balanceo de carga round-robin.
+- **Proxy pass**: Reenvía solicitudes HTTP al grupo upstream.
+- **Headers personalizados**:
+  - `X-Real-IP`: Captura la IP real del cliente.
+  - `X-Upstream-Server`: Muestra cuál servidor backend manejó la solicitud.
+  - `Cache-Control`: Desactiva el cacheo para monitorear el balanceo en tiempo real.
+
+**▶️ Comandos para ejecutar**:
+
+```bash
+cd BalanceadorCarga
+
+# Construir e iniciar todos los servicios
+docker-compose up -d --build
+
+# Ver logs del proxy
+docker-compose logs -f proxy
+
+# Detener todos los servicios
+docker-compose down
+
+# Reconstruir imágenes sin caché
+docker-compose build --no-cache
+```
+
+**🧪 Pruebas**:
+
+Una vez que el stack está en ejecución, puedes probar el balanceador de carga:
+
+```bash
+# Realizar múltiples solicitudes para ver el balanceo
+for i in {1..9}; do curl -i http://localhost:8081/; done
+
+# Ver encabezados de respuesta (incluyendo X-Upstream-Server)
+curl -v http://localhost:8081/
+
+# Inspeccionar logs de los servicios
+docker-compose logs backend1 backend2 backend3
+```
+
+**💡 Conceptos aprendidos**:
+
+- ✅ Orquestación de contenedores con Docker Compose.
+- ✅ Configuración de redes personalizadas (bridge) para aislar servicios.
+- ✅ Balanceo de carga con Nginx (upstream y proxy_pass).
+- ✅ Service discovery: Los contenedores se comunican entre sí usando nombres de servicios (backend1, backend2, backend3).
+- ✅ Gestión de dependencias entre servicios (depends_on).
+- ✅ Reenvío de encabezados HTTP para mantener información del cliente.
+
+---
+
+&nbsp;
+
 ## 🔧 Conceptos Avanzados
 
 ### 🔍 1. Build Context

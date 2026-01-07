@@ -1,0 +1,30 @@
+services:
+  proxy:
+    build: ./proxy
+    ports:
+      - "8081:80"
+    depends_on:
+      - backend1
+      - backend2
+      - backend3
+    networks:
+      - app-network
+
+  backend1:
+    build: ./sitio1
+    networks:
+      - app-network
+
+  backend2:
+    build: ./sitio2
+    networks:
+      - app-network
+
+  backend3:
+    build: ./sitio3
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
