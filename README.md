@@ -535,6 +535,111 @@ docker node ls
 
 &nbsp;
 
+## 9. 💻 DevContainer
+
+**📝 Descripción**: Este proyecto demuestra el uso de Dev Containers en Docker para crear entornos de desarrollo consistentes y reproducibles. Un Dev Container es un contenedor Docker configurado con todas las herramientas, extensiones y dependencias necesarias para desarrollar una aplicación, permitiendo que cualquier desarrollador tenga exactamente el mismo entorno sin necesidad de instalar software localmente.
+
+**❓ ¿Por qué usar Dev Containers?**
+
+- 🎯 **Consistencia**: Todos los desarrolladores trabajan en el mismo entorno, eliminando problemas de "funciona en mi máquina".
+- 🚀 **Rapidez**: Configura un ambiente de desarrollo completo en minutos sin instalaciones manuales.
+- 🔄 **Reproducibilidad**: El archivo `devcontainer.json` asegura que el entorno sea idéntico cada vez.
+- 🛠️ **Aislamiento**: Las dependencias están contenidas y no interfieren con el sistema host.
+- 📚 **Documentación viva**: El Dev Container actúa como documentación ejecutable del entorno requerido.
+- 🧩 **Integración con VS Code**: Extensiones y configuraciones se sincronizan automáticamente en el contenedor.
+
+**📋 Estructura del proyecto**:
+
+```
+DevContainer/
+├── .devcontainer/
+│   └── devcontainer.json       # Configuración del Dev Container
+├── app.js                       # Aplicación Node.js con Express
+├── package.json                 # Dependencias del proyecto
+└── .gitignore                   # Archivos ignorados por git
+```
+
+**🔍 Configuración destacada**:
+
+**devcontainer.json**:
+
+```jsonc
+{
+  "name": "Node.js & TypeScript",
+  // Imagen Docker con Node.js y TypeScript preinstalados
+  "image": "mcr.microsoft.com/devcontainers/typescript-node:1-22-bookworm",
+  
+  "customizations": {
+    "vscode": {
+      // Extensiones que se instalarán automáticamente en VS Code
+      "extensions": [
+        "chris-noring.node-snippets",
+        "afractal.node-essentials"
+      ]
+    }
+  }
+  
+  // Opciones comentadas disponibles:
+  // "forwardPorts": [3000],        // Exponer puertos del contenedor
+  // "postCreateCommand": "npm install", // Comando a ejecutar al crear el contenedor
+  // "remoteUser": "root"           // Usuario para ejecutar el contenedor
+}
+```
+
+**app.js** - Aplicación Express simple:
+
+```javascript
+const express = require("express");
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+app.get("/", (req, res) => {
+  res.send("¡Hola Mundo!");
+});
+
+app.listen(PORT, () => {
+  console.log(`Servidor corriendo en puerto http://localhost:${PORT}`);
+});
+```
+
+**🔑 Conceptos Clave**:
+
+1. **devcontainer.json**: Archivo de configuración que define:
+   - **Image**: Imagen Docker base (precompilada con herramientas necesarias).
+   - **Extensions**: Extensiones de VS Code que se instalan automáticamente.
+   - **ForwardPorts**: Puertos del contenedor expuestos en la máquina local.
+   - **PostCreateCommand**: Comandos ejecutados después de crear el contenedor (ideal para instalar dependencias).
+   - **Customizations**: Configuraciones específicas para herramientas (VS Code, JetBrains, etc.).
+
+2. **Imágenes Dev Container**: Microsoft proporciona imágenes precompiladas en `mcr.microsoft.com/devcontainers/` con Node.js, Python, Java, .NET, etc.
+
+3. **Flujo de Trabajo**:
+   - El contenedor se construye y ejecuta automáticamente.
+   - Tus archivos se montan como volúmenes en el contenedor.
+   - Ejecutas comandos dentro del contenedor (npm, yarn, etc.).
+   - Los cambios se reflejan inmediatamente en el host.
+
+**💡 Conceptos aprendidos**:
+
+- ✅ Creación de entornos de desarrollo consistentes y reproducibles.
+- ✅ Configuración de Dev Containers con `devcontainer.json`.
+- ✅ Instalación automática de extensiones de VS Code en el contenedor.
+- ✅ Montaje de volúmenes para sincronizar código entre host y contenedor.
+- ✅ Uso de características (features) para agregar herramientas adicionales.
+- ✅ Ejecución de comandos post-creación para automatizar setup.
+- ✅ Reenvío de puertos para acceder a servicios del contenedor desde el host.
+
+**🎯 Beneficios para equipos**:
+
+- **Onboarding rápido**: Nuevos desarrolladores ejecutan un contenedor en lugar de seguir documentos de configuración.
+- **Sin problemas de compatibilidad**: Todos los desarrolladores usan exactamente las mismas versiones de herramientas.
+- **CI/CD consistency**: El mismo entorno se usa en desarrollo y en pipelines de CI/CD.
+- **Fácil actualización**: Cambiar versiones de Node.js, TypeScript, etc., es tan simple como actualizar la imagen en `devcontainer.json`.
+
+---
+
+&nbsp;
+
 ## 🔧 Conceptos Avanzados
 
 ### 🔍 1. Build Context
