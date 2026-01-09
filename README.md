@@ -331,6 +331,210 @@ docker-compose logs backend1 backend2 backend3
 
 &nbsp;
 
+## 8. 🐳 Stacks (Docker Swarm)
+
+**📝 Descripción**: Este proyecto demuestra el uso de Docker Swarm y Docker Stacks para orquestar y desplegar aplicaciones distribuidas en modo cluster. Un Stack es un conjunto de servicios (multi-contenedor) que se definen en un archivo `docker-compose.yaml` y se despliegan en un clúster de Swarm, proporcionando escalabilidad, tolerancia a fallos y gestión centralizada.
+
+**🌐 Componentes de la Arquitectura**:
+
+- **Docker Swarm**: Orquestador nativo de Docker que permite agrupar múltiples daemons de Docker (managers y workers) en un clúster para desplegar y gestionar servicios.
+- **Manager Nodes**: Nodos que controlan el estado del clúster y distribuyen tareas entre workers.
+- **Worker Nodes**: Nodos que ejecutan los contenedores y servicios.
+- **Services**: Abstracciones de Docker Compose que reemplazan a los contenedores individuales, permitiendo réplicas, actualizaciones graduales y políticas de reinicio.
+- **Overlay Networks**: Redes que permiten la comunicación entre contenedores en diferentes hosts dentro del Swarm.
+
+**📋 Estructura del proyecto**:
+
+```
+Stacks/
+├── docker-compose.yaml       # Definición de servicios para el Stack
+└── app/
+    └── Dockerfile            # Imagen de la aplicación frontend
+```
+
+**🔍 Configuración destacada**:
+
+**docker-compose.yaml**:
+
+```yaml
+services:
+  web:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    deploy:
+      replicas: 3              # Ejecutar 3 instancias del servicio
+      update_config:
+        parallelism: 1         # Actualizar una instancia a la vez
+        delay: 10s             # Esperar 10 segundos entre actualizaciones
+      restart_policy:
+        condition: on-failure  # Reiniciar solo si falla
+    networks:
+      - frontend
+
+  app:
+    image: frontend:latest
+    deploy:
+      replicas: 5              # Ejecutar 5 instancias del servicio
+      restart_policy:
+        condition: any         # Reiniciar siempre que se detenga
+    networks:
+      - frontend
+      - backend
+
+networks:
+  frontend:
+    driver: overlay            # Red superpuesta para comunicación entre hosts
+  backend:
+    driver: overlay            # Red superpuesta para comunicación entre hosts
+```
+
+**🔑 Conceptos Clave**:
+
+1. **Replicas**: Define cuántas instancias de un servicio se ejecutarán en el clúster. Swarm distribuye estas instancias entre los worker nodes disponibles.
+
+2. **Update Config**: Controla cómo se actualizan los servicios:
+   - `parallelism`: Número de instancias a actualizar simultáneamente.
+   - `delay`: Tiempo de espera entre actualizaciones de instancias.
+
+3. **Restart Policy**: Define qué ocurre cuando un contenedor falla:
+   - `on-failure`: Reinicia solo si el contenedor sale con un código de error.
+   - `any`: Reinicia siempre que se detenga (recomendado para servicios críticos).
+   - `none`: No reinicia automáticamente.
+
+4. **Overlay Networks**: Redes virtuales que encapsulan el tráfico entre contenedores, permitiendo que servicios en diferentes hosts se comuniquen como si estuvieran en la misma red.
+
+5. **Service Discovery**: Swarm proporciona un DNS interno que permite que los servicios se descubran entre sí usando sus nombres.
+
+**▶️ Comandos para ejecutar**:
+
+**Inicializar Docker Swarm**:
+
+```bash
+# Inicializar el clúster Swarm (convierte el host actual en manager)
+docker swarm init
+
+# Ver información del Swarm
+docker swarm ls
+docker info | grep Swarm
+```
+
+**Desplegar un Stack**:
+
+```bash
+cd Stacks
+
+# Construir la imagen de la aplicación (si no existe)
+docker build -t frontend:latest ./app
+
+# Desplegar el Stack (requiere Swarm activo)
+docker stack deploy -c docker-compose.yaml mi_despliegue
+
+# Listar todos los Stacks desplegados
+docker stack ls
+
+# Ver servicios dentro del Stack
+docker stack services mi_despliegue
+
+# Ver tareas (contenedores) de un servicio específico
+docker service ps mi_despliegue_web
+docker service ps mi_despliegue_app
+```
+
+**Monitoreo y Gestión**:
+
+```bash
+# Ver logs de un servicio
+docker service logs mi_despliegue_web
+
+# Escalar un servicio (cambiar número de réplicas)
+docker service scale mi_despliegue_web=5
+
+# Inspeccionar detalles de un servicio
+docker service inspect mi_despliegue_web
+
+# Actualizar un servicio (cambiar imagen, portos, etc.)
+docker service update --image nginx:1.29 mi_despliegue_web
+```
+
+**Remover el Stack**:
+
+```bash
+# Eliminar el Stack y todos sus servicios
+docker stack rm mi_despliegue
+
+# Dejar el Swarm (desactiva modo Swarm)
+docker swarm leave --force
+
+# Listar nodos del Swarm (antes de dejar el Swarm)
+docker node ls
+```
+
+**🧪 Script de Demostración Completo**:
+
+```bash
+#!/bin/bash
+
+# 1. Inicializar Docker Swarm
+echo "Inicializando Docker Swarm..."
+docker swarm init
+
+# 2. Construir la imagen personalizada
+echo "Construyendo imagen de la aplicación..."
+docker build -t frontend:latest ./Stacks/app
+
+# 3. Desplegar el Stack
+echo "Desplegando Stack..."
+docker stack deploy -c ./Stacks/docker-compose.yaml mi_despliegue
+
+# 4. Verificar el despliegue
+echo "Esperando a que los servicios estén listos..."
+sleep 5
+
+echo "Listando Stacks:"
+docker stack ls
+
+echo "Listando servicios del Stack:"
+docker stack services mi_despliegue
+
+echo "Listando tareas (contenedores):"
+docker service ps mi_despliegue_web
+docker service ps mi_despliegue_app
+
+# 5. Prueba de conectividad
+echo "Probando acceso al servicio web..."
+curl -I http://localhost
+
+# 6. Información del clúster
+echo "Estado del clúster Swarm:"
+docker node ls
+
+# Limpieza (comentado para no eliminar el despliegue automáticamente)
+# echo "Eliminando Stack..."
+# docker stack rm mi_despliegue
+# docker swarm leave --force
+```
+
+**💡 Conceptos aprendidos**:
+
+- ✅ Inicialización de un clúster Docker Swarm.
+- ✅ Definición de servicios con configuración de réplicas y políticas de reinicio.
+- ✅ Despliegue de aplicaciones multi-servicio usando Docker Stacks.
+- ✅ Configuración de redes overlay para comunicación entre hosts.
+- ✅ Escalado dinámico de servicios.
+- ✅ Estrategias de actualización gradual (rolling updates).
+- ✅ Gestión del ciclo de vida de Stacks (crear, escalar, actualizar, eliminar).
+
+**⚠️ Consideraciones Importantes**:
+
+- **Ambiente de prueba**: Para experimentar con múltiples nodos, considera usar Docker en VMs o máquinas físicas separadas. En localhost, el Swarm funciona pero todos los contenedores se ejecutan en el mismo host.
+- **Producción**: Para entornos de producción, considera usar Kubernetes en lugar de Docker Swarm, ya que ofrece mayor escalabilidad y características avanzadas.
+- **Seguridad**: Asegúrate de asegurar el acceso al socket de Docker y usar TLS para comunicaciones entre nodos en producción.
+
+---
+
+&nbsp;
+
 ## 🔧 Conceptos Avanzados
 
 ### 🔍 1. Build Context

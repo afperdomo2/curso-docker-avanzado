@@ -1,0 +1,30 @@
+services:
+  web:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    deploy:
+      replicas: 3
+      update_config:
+        parallelism: 1 # Actualizar una instancia a la vez
+        delay: 10s # Esperar 10 segundos entre actualizaciones
+      restart_policy:
+        condition: on-failure # Reiniciar solo si falla
+    networks:
+      - frontend
+
+  app:
+    image: frontend:latest
+    deploy:
+      replicas: 5
+      restart_policy:
+        condition: any # Reiniciar siempre que se detenga
+    networks:
+      - frontend
+      - backend
+
+networks:
+  frontend:
+    driver: overlay # Overlay: permite la comunicación entre múltiples hosts Docker
+  backend:
+    driver: overlay # Overlay: permite la comunicación entre múltiples hosts Docker
